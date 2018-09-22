@@ -584,6 +584,7 @@
     <Compile Include="Assets\Add-ons\UnityPackages\JsonNetSample\JsonNetSample.cs" />
     <Compile Include="Assets\Add-ons\Universal Pixel Hero (Warrior)\Scripts\Controller.cs" />
     <Compile Include="Assets\CTRL_WarriorAvatar.cs" />
+    <Compile Include="Assets\OnAnimationEnd.cs" />
     <Compile Include="Assets\RotateFromMouseToCenter.cs" />
     <Compile Include="Assets\SCRPT\GAME\AnimationController.cs" />
     <Compile Include="Assets\SCRPT\GAME\CloseCameraFade.cs" />

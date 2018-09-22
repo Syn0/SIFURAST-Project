@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/SCNS/1-2d_level.unity
+- path: Assets/SCNS/3-ServerConnect.unity
   isLoaded: 1
   isActive: 1

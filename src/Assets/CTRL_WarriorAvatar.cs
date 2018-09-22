@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,7 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void Awake()
     {
+        //Debug.Log(Environment.Version);
         m_Animator = GetComponent<Animator>();
         m_Body = GetComponent<Rigidbody2D>();
         m_PhotonView = GetComponent<PhotonView>();
@@ -47,6 +49,7 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F)) m_Animator.SetInteger("stateVal", 4);
         if (Input.GetKeyDown(KeyCode.G)) m_Animator.SetInteger("stateVal", 5);
         if (Input.GetKeyDown(KeyCode.H)) m_Animator.SetInteger("stateVal", 6);
+        if (Input.GetKeyDown(KeyCode.C)) m_Animator.SetInteger("stateVal", 3);
     }
 
     void FixedUpdate()
@@ -102,12 +105,13 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void UpdateIsRunning()
     {
+        if (m_Animator.GetInteger("stateVal") > 2) return;
         if (Mathf.Abs(m_Body.velocity.x) > 0.1f && m_Animator.GetInteger("stateVal") != 2)
         {
             m_Animator.SetInteger("stateVal", 1);
-             m_Animator.SetFloat("runSpeed", Mathf.Abs(m_Body.velocity.x)/6f);
+            m_Animator.SetFloat("runSpeed", Mathf.Abs(m_Body.velocity.x) / 6f);
         }
-            m_Animator.SetInteger("stateVal", 1);
+        m_Animator.SetInteger("stateVal", 1);
         if (Mathf.Abs(m_Body.velocity.x) <= 0.1f && m_Animator.GetInteger("stateVal") == 1)
             m_Animator.SetInteger("stateVal", 0);
         //m_Animator.SetBool("IsRunning", Mathf.Abs(m_Body.velocity.x) > 0.1f);
@@ -115,7 +119,7 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void UpdateIsGrounded()
     {
-        Vector2 position = new Vector2(transform.position.x, transform.position.y - 0.05f);
+        Vector2 position = new Vector2(transform.position.x, transform.position.y - 0.1f);
 
         //RaycastHit2D hit = Physics2D.Raycast( position, -Vector2.up, 0.1f, 1 << LayerMask.NameToLayer( "Ground" ) );
         RaycastHit2D hit = Physics2D.Raycast(position, -Vector2.up, 0.05f);
