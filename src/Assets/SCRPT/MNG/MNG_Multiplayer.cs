@@ -7,14 +7,16 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class MNG_Multiplayer : MonoBehaviour {
 
+    public static MNG_Multiplayer instance { get; private set; }
 
     //Multi 
-    string MS_adress = "127.0.0.1";
-    int MS_port = 80;
-    ExitGames.Client.Photon.ConnectionProtocol MS_protocol = ExitGames.Client.Photon.ConnectionProtocol.WebSocket;
-    string MS_appid = "6d12a3eb-889b-463f-998e-4dee86b25971";
-    string MS_ConnVersion = "v1.0";
-    bool MS_WebCloudConnection = true;
+    public string MS_adress = "127.0.0.1";
+    public int MS_port = 80;
+    public ExitGames.Client.Photon.ConnectionProtocol MS_protocol = ExitGames.Client.Photon.ConnectionProtocol.WebSocket;
+    public string MS_appid = "6d12a3eb-889b-463f-998e-4dee86b25971";
+    public string MS_ConnVersion = "v1.0";
+    public bool MS_WebCloudConnection = true;
+    public bool loadFirstPreset = false;
 
     public void SetMS_adress(string value) { MS_adress = value; }
     public void SetMS_port(string value) { try { MS_port = int.Parse(value); } catch { } }
@@ -56,11 +58,14 @@ public class MNG_Multiplayer : MonoBehaviour {
     /// On commence par appliquer une configuration réseau par défaut et on essaye de s'y connecter.
     /// </summary>
     void Start () {
-
-        loadConnectionsPresets();
-        onNewConnectionPreset(0);
-        Btn_Multiplayer.interactable = false;
-        tryLoggingtoMaster();
+        instance = this;
+        //loadConnectionsPresets();
+        if (!PhotonNetwork.connected)
+        {
+            if (loadFirstPreset) onNewConnectionPreset(0);
+            Btn_Multiplayer.interactable = false;
+            startPUNConnect();
+        }
     }
 	
     /// <summary>
@@ -75,28 +80,75 @@ public class MNG_Multiplayer : MonoBehaviour {
         text_ConnectionState.text = (context!=""?"["+ context + " ] ":"") + PhotonNetwork.networkingPeer.State.ToString();
     }
 
+    //████████████████████████████████████████████████
+
     /// <summary>
     /// Méthode de tentative de connexion au serveur de Photon.
     /// </summary>
-    public void tryLoggingtoMaster()
+    public void startPUNConnect()
     {
-        if (!PhotonNetwork.connected)
+        StartCoroutine(TryLogToMaster());
+    }
+    IEnumerator TryLogToMaster()
+    {
+        while (!PhotonNetwork.connected)
         {
             if (MS_WebCloudConnection)
             {
-                print("<color=green>Trying ConnectToRegion EU : " + MS_ConnVersion+" </color>");
-                PhotonNetwork.ConnectToRegion(CloudRegionCode.eu,MS_ConnVersion);
+                print("<color=green>Trying ConnectToRegion EU : " + MS_ConnVersion + " </color>");
+                PhotonNetwork.ConnectToRegion(CloudRegionCode.eu, MS_ConnVersion);
             }
             else
             {
                 print("PhotonNetwork.gameVersion: " + PhotonNetwork.gameVersion);
                 print("PhotonNetwork.versionPUN: " + PhotonNetwork.versionPUN);
-                print("<color=green>Trying ConnectToMaster : " + MS_adress + ":" + MS_port + " " +MS_ConnVersion+ " "+ MS_protocol.ToString()+ " </color>");
+                print("<color=orange>Trying ConnectToMaster : " + MS_adress + ":" + MS_port + " " + MS_ConnVersion + " " + MS_protocol.ToString() + " </color>");
                 PhotonNetwork.SwitchToProtocol(MS_protocol);
                 PhotonNetwork.ConnectToMaster(MS_adress, MS_port, MS_appid, MS_ConnVersion);
             }
+            yield return new WaitForSecondsRealtime(3f);
         }
+        print("<color=green>Connected to master  : " + MS_adress + ":" + MS_port + " " + MS_ConnVersion + " " + MS_protocol.ToString() + " </color>");
     }
+
+    /// <summary>
+    /// Une fois la connection établie : On affecte un nom au joueur et on authorise le joueur à se connecter à un serveur.
+    /// </summary>
+    public void OnConnectedToMaster()
+    {
+        Btn_Multiplayer.interactable = true;
+        Input_Pseudo.interactable = true;
+
+        if (wwwManager.instance.ServerStatus == wwwManager.serverStatus.Connected)
+        {
+            onPseudoChange(WebCredential.playerCredential.UserName);
+        }
+        else
+        {
+            PhotonNetwork.player.SetPlayerState(PlayerState.inMenu);
+            if (PlayerPrefs.GetString("playerName") == "")
+                onPseudoChange("Guest" + Random.Range(1, 9999));
+            else
+                Input_Pseudo.text = PlayerPrefs.GetString("playerName");
+        }
+        //PhotonNetwork.JoinLobby();  // this joins the "default" lobby
+    }
+    /// <summary>
+    /// Fonction de fermeture de l'application
+    /// </summary>
+    public void CloseGame()
+    {
+        Application.Quit();
+    }
+    public void DisconnectPUN()
+    {
+        if (PhotonNetwork.inRoom) PhotonNetwork.LeaveRoom();
+        if (PhotonNetwork.insideLobby) PhotonNetwork.LeaveLobby();
+        if (PhotonNetwork.Server == ServerConnection.MasterServer) PhotonNetwork.Disconnect();
+    }
+
+    //████████████████████████████████████████████████
+
 
     /// <summary>
     /// Aide visuel par F2 pour la room du joueur.
@@ -203,7 +255,6 @@ public class MNG_Multiplayer : MonoBehaviour {
         Input_Pseudo.interactable = false;
 
     }
-    void OnConnectedToServer(){ }
     void OnServerInitialized(){}
     void OnDisconnectedFromServer(NetworkDisconnection info){}
     void OnFailedToConnect(NetworkConnectionError error){}
@@ -214,9 +265,7 @@ public class MNG_Multiplayer : MonoBehaviour {
     void OnPlayerConnected(NetworkPlayer player){}
     void OnPlayerDisconnected(NetworkPlayer player){ }
     void OnDisconnectedFromPhoton(){Debug.LogWarning("OnDisconnectedFromPhoton");}
-    public void LeaveRoom() { if (PhotonNetwork.room != null) PhotonNetwork.LeaveRoom(); }
-    public void DisconnectFromServer() { if (PhotonNetwork.Server == ServerConnection.GameServer) PhotonNetwork.Disconnect(); }
-    public void DisconnectFromMaster() { if (PhotonNetwork.Server == ServerConnection.MasterServer) PhotonNetwork.Disconnect(); }
+    private void OnConnectedToServer() { print("OnConnectedToServer : " + PhotonNetwork.connectionStateDetailed); }
 
     IEnumerator OnLeftRoom()
     {
@@ -242,23 +291,30 @@ public class MNG_Multiplayer : MonoBehaviour {
         Input_Pseudo.text = value;
     }
 
+    //████████████████████████████████████████████████
+
+    string SelectedRoom = "";
+
+
     /// <summary>
-    /// Une fois la connection établie : On affecte un nom au joueur et on authorise le joueur à se connecter à un serveur.
+    /// Creation de serveur
     /// </summary>
-    public void OnConnectedToMaster()
+    public void CreateRoom() { PhotonNetwork.CreateRoom("Serveur de " + PhotonNetwork.playerName, new RoomOptions() { MaxPlayers = 16, IsOpen = false }, TypedLobby.Default); }
+    /// <summary>
+    /// Tentative de connection à une room
+    /// </summary>
+    public void JoinRoom()
     {
-        Btn_Multiplayer.interactable = true;
-        Input_Pseudo.interactable = true;
-        PhotonNetwork.player.SetPlayerState(PlayerState.inMenu);
-        print("PhotonNetwork.JoinLobby()");
-        if (PlayerPrefs.GetString("playerName") == "")
-            onPseudoChange("Guest" + Random.Range(1, 9999));
-        else
-            Input_Pseudo.text = PlayerPrefs.GetString("playerName");
-
-        PhotonNetwork.JoinLobby();  // this joins the "default" lobby
+        if (PhotonNetwork.connected && SelectedRoom != null && SelectedRoom != "")
+        {
+            PhotonNetwork.JoinRoom(SelectedRoom);
+            PhotonNetwork.player.SetPlayerState(PlayerState.joiningRoom);
+        }
     }
-
+    /// <summary>
+    /// Quitter la room
+    /// </summary>
+    public void ExitRoom() { if (PhotonNetwork.inRoom) PhotonNetwork.LeaveRoom(false); }
 
 }
 

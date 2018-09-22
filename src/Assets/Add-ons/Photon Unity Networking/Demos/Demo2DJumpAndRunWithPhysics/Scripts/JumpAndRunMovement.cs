@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class JumpAndRunMovement : MonoBehaviour
 {
+    public Text txt_Username;
     public float Speed;
     public float JumpForce;
 
@@ -17,6 +19,11 @@ public class JumpAndRunMovement : MonoBehaviour
         m_Animator = GetComponent<Animator>();
         m_Body = GetComponent<Rigidbody2D>();
         m_PhotonView = GetComponent<PhotonView>();
+    }
+
+    private void Start()
+    {
+        txt_Username.text = WebCredential.playerCredential.UserName;
     }
 
     void Update()
@@ -101,4 +108,37 @@ public class JumpAndRunMovement : MonoBehaviour
         m_IsGrounded = hit.collider != null;
         m_Animator.SetBool( "IsGrounded", m_IsGrounded );
     }
+
+
+    public void run()
+    {
+        m_Animator.SetTrigger("run");
+    }
+
+    public void jump()
+    {
+        m_Animator.SetTrigger("jump");
+    }
+
+    public void attack1()
+    {
+        m_Animator.SetTrigger("attack1");
+    }
+
+    public void attack2()
+    {
+        m_Animator.SetTrigger("attack2");
+    }
+
+    public void attack3()
+    {
+        m_Animator.SetTrigger("attack3");
+    }
+
+    public void skill()
+    {
+        m_Animator.SetTrigger("skill");
+    }
+
+
 }

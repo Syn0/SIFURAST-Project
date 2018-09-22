@@ -13,17 +13,13 @@ public class MNG_MainMenu : MonoBehaviour {
     public GameObject Panel_MainSelection;
     public GameObject Panel_Multiplayer;
     public GameObject Panel_Settings;
-    public GameObject Panel_Credits;
     public GameObject Panel_Gameboard;
-    public GameObject Panel_Help;
 
     //Multiplayer panel room management
     public RectTransform Rect_RoomslistScrollview;
     public Button gop_BtnRoom;
     Button Btn_SelectedRoom;
     public string SelectedRoom = "";
-    public GameObject RoomMenu;
-    public GameObject SpecateMenu;
     public static bool captureMouse {
         get { return _captureStatic; }
         set 
@@ -37,12 +33,6 @@ public class MNG_MainMenu : MonoBehaviour {
     public AudioSource MainMusic;
     public static Vector2 cameraRotationSpeed = new Vector2(80, 80);
 
-    //SETTINGSTEXTSHOW
-    public GameObject Panel_Settingstext;
-    public Text text_settings;
-    public float duration_settingshide = 1f;
-    public float time_settingsshow;
-
     //=============================================================================================//
 
     /// <summary>
@@ -51,16 +41,13 @@ public class MNG_MainMenu : MonoBehaviour {
     /// </summary>
     public void Start()
     {
-        RoomMenu.SetActive(PhotonNetwork.inRoom);
         Panel_Gameboard.SetActive(false);
         Show_PanelMain();
-        time_settingsshow = Time.timeSinceLevelLoad;
 
         if(PlayerPrefs.HasKey("MusicMute")) MainMusic.mute = PlayerPrefs.GetString("MusicMute") == true.ToString();
         if (PlayerPrefs.HasKey("MusicVolume")) MainMusic.volume = PlayerPrefs.GetFloat("MusicVolume");
         if (PlayerPrefs.HasKey("MouseSensibility")) cameraRotationSpeed = new Vector2(PlayerPrefs.GetFloat("MouseSensibility"), PlayerPrefs.GetFloat("MouseSensibility"));
     }
-
 
     /// <summary>
     /// Rafraichis la liste des rooms dans l'interface du jeu
@@ -112,27 +99,6 @@ public class MNG_MainMenu : MonoBehaviour {
         Btn_SelectedRoom = newRoomBtn;
     }
 
-    /// <summary>
-    /// Creation de serveur
-    /// </summary>
-    public void CreateServer(){PhotonNetwork.CreateRoom("Serveur de "+PhotonNetwork.playerName, new RoomOptions() { MaxPlayers = 16,IsOpen = false }, TypedLobby.Default);}
-
-    /// <summary>
-    /// Tentative de connection à une room
-    /// </summary>
-    public void JoinServer(){
-        if (PhotonNetwork.connected && SelectedRoom != null && SelectedRoom != "")
-        {
-            PhotonNetwork.JoinRoom(SelectedRoom);
-            PhotonNetwork.player.SetPlayerState(PlayerState.joiningRoom);
-        }
-    }
-
-    /// <summary>
-    /// Quitter la room
-    /// </summary>
-    public void ExitServer() { if (PhotonNetwork.inRoom) PhotonNetwork.LeaveRoom(false);}
-
     // GESTION DES PANNEAUX D'AFFICHAGE
     public void Show_PanelMultiplayer(){HideAll_Panel();Panel_Multiplayer.SetActive(true);}
     public void Show_PanelSettings(){HideAll_Panel();Panel_Settings.SetActive(true);}
@@ -143,8 +109,6 @@ public class MNG_MainMenu : MonoBehaviour {
         Panel_Multiplayer.SetActive(false);
         Panel_Settings.SetActive(false);
     }
-
-    private void OnConnectedToServer() { print("OnConnectedToServer : " + PhotonNetwork.connectionStateDetailed); }
 
     /// <summary>
     /// Quelques actions possibles pour le joueur
@@ -175,36 +139,14 @@ public class MNG_MainMenu : MonoBehaviour {
         if (captureMouse) { Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false; }
             
         // HELP MENU
-        Panel_Help.SetActive(Input.GetKey(KeyCode.F1));
 
         //MUSIC MANAGEMENT
         InputMusic();
 
         //AFFICHAGE DES CONFIGURATIONS
         InputsSettings();
-
-        //MONTRE LE PANNEAU DES CREDITS
-        if (Input.GetKey(KeyCode.F12)) Panel_Credits.SetActive(true);
-        else Panel_Credits.SetActive(false);
-
-        // HIDESHOW SETTINGS INPUTS
-        if (Panel_Settingstext.activeInHierarchy && Time.timeSinceLevelLoad - time_settingsshow > duration_settingshide)
-        {
-            HideSettingsPanel();
-        }
     }
 
-    public void ShowSettingsText(string text)
-    {
-        Panel_Settingstext.SetActive(true);
-        text_settings.text = text;
-        time_settingsshow = Time.timeSinceLevelLoad;
-
-    }
-    public void HideSettingsPanel()
-    {
-        Panel_Settingstext.SetActive(false);
-    }
 
     /// <summary>
     /// Gestion de la musique
@@ -222,7 +164,6 @@ public class MNG_MainMenu : MonoBehaviour {
         {
             MainMusic.volume -= 0.1f;
             if (MainMusic.volume < 0) MainMusic.volume = 0;
-            ShowSettingsText("Music volume : " + MainMusic.volume);
             PlayerPrefs.SetFloat("MusicVolume", MainMusic.volume);
         }
         //AUGMENTE LE VOLUME
@@ -230,7 +171,6 @@ public class MNG_MainMenu : MonoBehaviour {
         {
             MainMusic.volume += 0.1f;
             if (MainMusic.volume > 1) MainMusic.volume = 1;
-            ShowSettingsText("Music volume : " + MainMusic.volume);
             PlayerPrefs.SetFloat("MusicVolume", MainMusic.volume);
         }
 
@@ -247,7 +187,6 @@ public class MNG_MainMenu : MonoBehaviour {
         {
             cameraRotationSpeed.x -= 10;
             cameraRotationSpeed.y -= 10;
-            ShowSettingsText("Mouse sensibility : " + cameraRotationSpeed.x);
             PlayerPrefs.SetFloat("MouseSensibility", cameraRotationSpeed.y);
         }
         //DIMINUE LA SENSIBILITE DE LA SOURIS
@@ -255,14 +194,13 @@ public class MNG_MainMenu : MonoBehaviour {
         {
             cameraRotationSpeed.x += 10;
             cameraRotationSpeed.y += 10;
-            ShowSettingsText("Mouse sensibility : " + cameraRotationSpeed.x);
             PlayerPrefs.SetFloat("MouseSensibility", cameraRotationSpeed.y);
         }
 
     }
 
-    public void OnJoinedRoom() { RoomMenu.SetActive(true); MenuPanel.SetActive(false); }
-    public void OnLeftRoom() { RoomMenu.SetActive(false); }
+    public void OnJoinedRoom() { MenuPanel.SetActive(false); }
+    public void OnLeftRoom() { }
     
     /// <summary>
     /// Fonction de fermeture de l'application

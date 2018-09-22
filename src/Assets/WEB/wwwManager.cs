@@ -8,10 +8,13 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class wwwManager : MonoBehaviour
 {
+    public static wwwManager instance { get; private set; }
+    //
     public InputField input_email;
     public InputField input_password;
     public Text txt_status;
@@ -29,9 +32,17 @@ public class wwwManager : MonoBehaviour
     public bool showHeaders;
     public Dictionary<string, string> CookieHashTable = new Dictionary<string, string>();
     //--------//
+    public enum serverStatus { NotConnected,NotAvailable,Connected}
+    public bool ServerAvailable { get; private set; }
+    public serverStatus ServerStatus { get; private set; }
+    //--------//
     void Start()
     {
+        ServerAvailable = false;
+        ServerStatus = serverStatus.NotConnected; ;
+        instance = this;
         setupUrls();
+        StartCoroutine(PingServer());
     }
     void Update()
     {
@@ -46,12 +57,12 @@ public class wwwManager : MonoBehaviour
         url_Ping = url_base + "/Game/Ping";
         url_GetFriendsListInfo = url_base + "/Game/GetFriendsListInfo";
     }
-
     public void Connect()
     {
+        //PhotonNetwork.Server == ServerConnection.MasterServer
+        if (!PhotonNetwork.connectedAndReady) { DebugLog("Log first to Photon"); return; }
         //btn_connect.interactable = false;
-        DebugLog("### START : " + DateTime.Now);
-        StartCoroutine(PingServer());
+        StartCoroutine(GetAFT());
     }
     //--------//
     public Antiforgery ParseJsonAFT(string json)
@@ -70,14 +81,14 @@ public class wwwManager : MonoBehaviour
         UnityWebRequest www = UnityWebRequest.Post(url_Ping, "");
         yield return www.SendWebRequest();
         //
-        if (www.isNetworkError || www.isHttpError) { DebugLog(www.error); DebugLog(">> ! AUNCUNE REPONSE DU SERVEUR !"); yield break; }
+        if (www.isNetworkError || www.isHttpError) { DebugLog(www.error); DebugLog("Server Offline"); ServerAvailable = false; yield break; }
         //
         ReadResponse(www, showHeaders);
+        ServerAvailable = true;
         //
-        DebugLog(">> PING.SERVER : PONGED");
-        StartCoroutine(GetAFT());
+        DebugLog("Server Online");
     }
-
+    //--------//
     IEnumerator GetAFT()
     {
         DebugLog(">> GET.ANTIFORGERYTOKEN");
@@ -117,6 +128,7 @@ public class wwwManager : MonoBehaviour
         WWWForm form = new WWWForm();
         form.AddField("__RequestVerificationToken", AntiforgeryToken.formAFT);
         form.AddField("Password", input_password.text);
+        input_password.text = "";
         form.AddField("Email", input_email.text);
         form.AddField("RememberMe", "true");
         //
@@ -131,10 +143,11 @@ public class wwwManager : MonoBehaviour
         LIResult = JsonConvert.DeserializeObject<LoginResult>(FormatJson(www.downloadHandler.text));
         //
         bool loginOK = LIResult.Result == "Success";
-        if (!loginOK) { DebugLog(">> LOGIN FAILED "); DebugLog("### END " + DateTime.Now); }
+        if (!loginOK) { DebugLog(">> LOGIN FAILED ");  }
         else
         {
             DebugLog(">> LOGIN COMPLETE");
+            ServerStatus = serverStatus.NotConnected;
             StartCoroutine(GetSessionAFT());
         }
     }
@@ -170,10 +183,13 @@ public class wwwManager : MonoBehaviour
         //
         DebugLog(">> TESTSESSION COMPLETE");
         txt_status.text = "Connexion avec succès !";
+
+
+        new WebCredential(new PlayerCredential { UserEmail = input_email.text, UserId = "NA", UserName = input_email.text.Split('@')[0] },AntiforgeryToken);
+        //
         StartCoroutine(GetFriendList());
-
     }
-
+    //--------//
     IEnumerator GetFriendList()
     {
         UnityWebRequest www;
@@ -189,9 +205,24 @@ public class wwwManager : MonoBehaviour
         List<FriendInfo> frndlst = JsonConvert.DeserializeObject<List<FriendInfo>>(FormatJson(www.downloadHandler.text));
         //
         DebugLog(">> GetFriendList COMPLETE");
-
+        //
+        while (!PhotonNetwork.connected) new WaitForSecondsRealtime(2f);
+        MNG_Multiplayer.instance.CreateRoom();
+        StartCoroutine(MoveToGameScene());
     }
     //--------//
+    IEnumerator MoveToGameScene()
+    {
+        // Temporary disable processing of futher network messages
+        PhotonNetwork.isMessageQueueRunning = false;
+        SceneManager.LoadScene("1-2d_level");//SceneManager.GetActiveScene().name); // custom method to load the new scene by name
+        while (true/*newSceneDidNotFinishLoading*/)
+        {
+            yield return null;
+        }
+        PhotonNetwork.isMessageQueueRunning = true;
+    }
+    //
     void ReadResponse(UnityWebRequest www, bool logHeaders = false)
     {
         if (www.isNetworkError || www.isHttpError)
@@ -259,157 +290,22 @@ public class wwwManager : MonoBehaviour
         //go_text.text = go_text.text + "\n" + str;
     }
 
-
-
-
-    public static string HashPassword(string password)
-    {
-        byte[] salt;
-        byte[] buffer2;
-        if (password == null)
-        {
-            throw new ArgumentNullException("password is null");
-        }
-        using (Rfc2898DeriveBytes bytes = new Rfc2898DeriveBytes(password, 0x10, 0x3e8))
-        {
-            salt = bytes.Salt;
-            buffer2 = bytes.GetBytes(0x20);
-        }
-        byte[] dst = new byte[0x31];
-        Buffer.BlockCopy(salt, 0, dst, 1, 0x10);
-        Buffer.BlockCopy(buffer2, 0, dst, 0x11, 0x20);
-        return Convert.ToBase64String(dst);
-    }
-
-    //-------- EXAMPLES//
-    /*
-    <form action="/Account/Login?ReturnUrl=%2FGame%2FTestIsLogged2"
-    class="form-horizontal" method="post" role="form"><input
-    name="__RequestVerificationToken" type="hidden" 
-    value="
-    tj1K-CzfGETdzAsuniwpODO_vy-3AELwIx5POgTCwXXTRkTBhZDJ7jHNP0yCbaCIpFoKB3AU0Tun5AyxlLX4WjQHN2OhEDUv4TWITOIpgJlqpKRH2JQpTp78W-ZLIZcZIZaMfar_o8qURBj14FRrWw2
-    9LQ9x_YUTShaqXg2mm9FMj5nYSjWwpG3O9XI3Samg-v2yMlhhwRdFHVyWboNP8w5R_qiAWl7kUkaHoH8V56kkPgHS6uE_tcIVNQy5WOt77E1:am58EiP9OWtvOlxiwDmcaerbnn2-OhahPLgj8Kdh3VU4uSwcAqT_PEe1_gksgw9JGPgIod_0qXE9QzbGQJEHnY6-_NTEGLhJhrzlZWA9rLs1
-
-
-    /*
-    public WWW POST_JSON()
-    {
-        UnityEngine.WWW www;
-        Hashtable postHeader = new Hashtable();
-        postHeader.Add("Content-Type", "application/json");
-        // convert json string to byte
-        var formData = System.Text.Encoding.UTF8.GetBytes(jsonStr);
-        www = new WWW(POSTAddUserURL, formData, postHeader);
-        DebugLog(">> SENDED");
-        StartCoroutine(WaitForRequest(www));
-        return www;
-    }
-    */
-    /*void test()
-    {
-        try
-        {
-            string url_registerEvent = "http://demo....?parameter1=" parameter1value"&parameter2="parameter2value;
-            WebRequest req = WebRequest.Create(url_registerEvent);
-            req.ContentType = "application/json";
-            req.Method = "SET";
-            //req.Credentials = new NetworkCredential ("connect10@gmail.com", "connect10api");
-            HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
-            var encoding = resp.CharacterSet == ""
-                        ? Encoding.UTF8
-                        : Encoding.GetEncoding(resp.CharacterSet);
-            using (var stream = resp.GetResponseStream())
-            {
-                var reader = new StreamReader(stream, encoding);
-                var responseString = reader.ReadToEnd();
-
-                Debug.Log("Result :" + responseString);
-                //JObject json = JObject.Parse(str);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.Log("ERROR : " + e.Message);
-        }
-    }
-    */
 }
-//-------- EXAMPLES//
-/*
-public class UsingJsonDotNetInUnity : MonoBehaviour
+
+public class WebCredential
 {
-    private void Awake()
-    {
-        var accountJames = new Account
-        {
-            Email = "james@example.com",
-            Active = true,
-            CreatedDate = new DateTime(2013, 1, 20, 0, 0, 0, DateTimeKind.Utc),
-            Roles = new List<string>
-            {
-                "User",
-                "Admin"
-            },
-            Ve = new Vector3(10, 3, 1),
-            StrVector3Dictionary = new Dictionary<string, Vector3>
-            {
-                {"start", new Vector3(0, 0, 1)},
-                {"end", new Vector3(9, 0, 1)}
-            }
-        };
-
-
-        var accountOnion = new Account
-        {
-            Email = "onion@example.co.uk",
-            Active = true,
-            CreatedDate = new DateTime(2013, 1, 20, 0, 0, 0, DateTimeKind.Utc),
-            Roles = new List<string>
-            {
-                "User",
-                "Admin"
-            },
-            Ve = new Vector3(0, 3, 1),
-            StrVector3Dictionary = new Dictionary<string, Vector3>
-            {
-                {"vr", new Vector3(0, 0, 1)},
-                {"pc", new Vector3(9, 9, 1)}
-            }
-        };
-
-
-        var setting = new JsonSerializerSettings();
-        setting.Formatting = Formatting.Indented;
-        setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-
-        var path = Path.Combine(Application.dataPath, "hi.json");
-
-        // write
-        var accountsFromCode = new List<Account> { accountJames, accountOnion };
-        var json = JsonConvert.SerializeObject(accountsFromCode, setting);
-        File.WriteAllText(path, json);
-
-        // read
-        var fileContent = File.ReadAllText(path);
-        var accountsFromFile = JsonConvert.DeserializeObject<List<Account>>(fileContent);
-        var reSerializedJson = JsonConvert.SerializeObject(accountsFromFile, setting);
-
-        print(reSerializedJson);
-        print("json == reSerializedJson is" + (json == reSerializedJson));
-    }
-
-    public class Account
-    {
-        public string Email { get; set; }
-        public bool Active { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public IList<string> Roles { get; set; }
-        public Vector3 Ve { get; set; }
-        public Dictionary<string, Vector3> StrVector3Dictionary { get; set; }
-    }
-
+    public static PlayerCredential playerCredential { get; private set; }
+    public static Antiforgery antiforgery { get; private set; }
+    public WebCredential(PlayerCredential _playerCredential, Antiforgery _antiforgery) { playerCredential = _playerCredential;antiforgery = _antiforgery; }
 }
-    */
+
+public struct PlayerCredential
+{
+    public string UserName;
+    public string UserEmail;
+    public string UserId;
+}
+
 public class AntiForgeryToken
 {
     public string __RequestVerificationToken { get; set; }
@@ -440,3 +336,24 @@ public class UnityUserInfo
     public string Biographie { get; set; }
     public string Location { get; set; }
 }
+
+/* -------- EXAMPLES//
+var setting = new JsonSerializerSettings();
+setting.Formatting = Formatting.Indented;
+setting.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+var path = Path.Combine(Application.dataPath, "hi.json");
+
+// write
+var accountsFromCode = new List<Account> { accountJames, accountOnion };
+var json = JsonConvert.SerializeObject(accountsFromCode, setting);
+File.WriteAllText(path, json);
+
+// read
+var fileContent = File.ReadAllText(path);
+var accountsFromFile = JsonConvert.DeserializeObject<List<Account>>(fileContent);
+var reSerializedJson = JsonConvert.SerializeObject(accountsFromFile, setting);
+
+print(reSerializedJson);
+print("json == reSerializedJson is" + (json == reSerializedJson));
+*/

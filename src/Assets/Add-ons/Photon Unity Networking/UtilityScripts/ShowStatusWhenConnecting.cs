@@ -13,7 +13,7 @@ public class ShowStatusWhenConnecting : MonoBehaviour
         }
 
         float width = 300;
-        float height = 50;
+        float height = 100;
 
         Rect centeredRect = new Rect( ( Screen.width - width -5 ) , ( Screen.height - height -5 ), width, height );
 

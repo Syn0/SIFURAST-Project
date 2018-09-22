@@ -19,7 +19,21 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public virtual void Start()
     {
+
+        PhotonNetwork.sendRate = 100;
         PhotonNetwork.autoJoinLobby = false;    // we join randomly. always. no need to join a lobby to get the list of rooms.
+        Debug.Log("2dlevel.Start()");
+        if (PhotonNetwork.connected)
+        {
+            PhotonNetwork.isMessageQueueRunning = true;
+
+            if (PhotonNetwork.inRoom) PhotonNetwork.LeaveRoom();
+            if (PhotonNetwork.insideLobby) PhotonNetwork.LeaveLobby();
+        }
+        else
+        {
+            Debug.Log("NOT PhotonNetwork.connected");
+        }
     }
 
     public virtual void Update()
@@ -40,20 +54,20 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public virtual void OnConnectedToMaster()
     {
-        Debug.Log("OnConnectedToMaster() was called by PUN. Now this client is connected and could join a room. Calling: PhotonNetwork.JoinRandomRoom();");
+        Debug.Log("OnConnectedToMaster()");
         PhotonNetwork.JoinRandomRoom();
     }
-
+    
     public virtual void OnJoinedLobby()
     {
-        Debug.Log("OnJoinedLobby(). This client is connected and does get a room-list, which gets stored as PhotonNetwork.GetRoomList(). This script now calls: PhotonNetwork.JoinRandomRoom();");
+        Debug.Log("OnJoinedLobby()");
         PhotonNetwork.JoinRandomRoom();
     }
 
     public virtual void OnPhotonRandomJoinFailed()
     {
-        Debug.Log("OnPhotonRandomJoinFailed() was called by PUN. No random room available, so we create one. Calling: PhotonNetwork.CreateRoom(null, new RoomOptions() {maxPlayers = 4}, null);");
-        PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 4 }, null);
+        Debug.Log("OnPhotonRandomJoinFailed()");
+        PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 10 }, null);
     }
 
     // the following methods are implemented to give you some context. re-implement them as needed.
@@ -65,6 +79,6 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public void OnJoinedRoom()
     {
-        Debug.Log("OnJoinedRoom() called by PUN. Now this client is in a room. From here on, your game would be running. For reference, all callbacks are listed in enum: PhotonNetworkingMessage");
+        Debug.Log("OnJoinedRoom()");
     }
 }

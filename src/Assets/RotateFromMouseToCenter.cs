@@ -8,7 +8,7 @@ public class RotateFromMouseToCenter : MonoBehaviour {
 	void Update () {
         transform.rotation = Quaternion.Euler(
             (Screen.height / 2f - Input.mousePosition.y) * multiplier,
-            (Screen.width / 2f - Input.mousePosition.x) * multiplier,
+            (Screen.width / 2f - Input.mousePosition.x) * -multiplier,
             0f
             );
 	}

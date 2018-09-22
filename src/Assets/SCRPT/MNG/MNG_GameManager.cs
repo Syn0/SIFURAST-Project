@@ -19,16 +19,9 @@ public class MNG_GameManager : Photon.MonoBehaviour
     public int durationRoundFinalize = 5000;
 
     //DISPLAY
-    public Text text_Gamestatus;
-    public Text text_RoundNumber;
-    public Text text_Timer;
     public Text text_btn_Ready;
     public GameObject go_checkmark_Ready;
     MNG_MainMenu mng_main;
-
-    //PRISON
-    public GameObject go_Prison;
-    public static Vector3 getPrisonLocation {get{ return instance.go_Prison.transform.position; }}
 
     //GAMEBOARD
     public GameObject content_Gameboard;
@@ -52,7 +45,6 @@ public class MNG_GameManager : Photon.MonoBehaviour
         if (!PhotonNetwork.inRoom) return;
 
         //MISE A JOUR AFFICHAGE DU STATUS DE CONNECTION A LA ROOM  
-        text_Gamestatus.text = (PhotonNetwork.room.GetRoomState()).ToString();
 
         if ( PhotonNetwork.room.GetAttribute(RoomAttributes.PLAYERSCANSPAWN,false)
             && PhotonNetwork.player.getTeamID()!=0
@@ -86,20 +78,8 @@ public class MNG_GameManager : Photon.MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F10)){
             photonView.RPC("rpc_UnspawnPlayerAvatar", PhotonTargets.All, new object[] { PhotonNetwork.player});
         }
-        UpdateTimer();
     }
 
-    /// <summary>
-    /// MAJ du Timer de fin de round
-    /// </summary>
-    public void UpdateTimer()
-    {
-        int timeleft = durationRound/1000 - (int)(PhotonNetwork.ServerTimestamp - PhotonNetwork.room.GetAttribute(RoomAttributes.TIMEROUNDSTARTED, PhotonNetwork.ServerTimestamp))/1000;
-        if (PhotonNetwork.room.GetRoomState() == GameState.RoundRunning)
-            text_Timer.text = (timeleft/60) +"m "+(timeleft%60) +"s";
-        else
-            text_Timer.text = "-";
-    }
 
 
 
@@ -150,6 +130,8 @@ public class MNG_GameManager : Photon.MonoBehaviour
         
         PhotonNetwork.player.SetAttribute(PlayerAttributes.TEAM, 0);
         InvokeRepeating("RefreshGameBoard", 0f, 1f);
+
+        SpawnMyAvatar();
     }
     void OnLeftRoom()
     {
@@ -171,10 +153,6 @@ public class MNG_GameManager : Photon.MonoBehaviour
     {
         PhotonPlayer[] plist = PhotonNetwork.playerList; // BUGFIX CAR LA LISTE PEUT CHANGER EN TRAITEMENT
 
-        // ACTUALISE L'ENTETE DU GAMEBOARD, AFIN DE SAVOR LE NUMERO DU ROUND ACTUEL
-        if (PhotonNetwork.room.GetRoomState() == GameState.WarmUp) text_RoundNumber.text = "Warmup";
-        else text_RoundNumber.text = PhotonNetwork.room.GetRoomState().ToString() + " " + PhotonNetwork.room.GetAttribute(RoomAttributes.ROUNDNUMBER, 0);
-        
         // RAFRAICHISSEMENT DU GAMEBOARD DES JOUEURS
         List<PlayerGBInfo> newList = playersGBInfoList.ToList();
         foreach (PlayerGBInfo PGBI in playersGBInfoList.ToList())
@@ -325,6 +303,7 @@ public class MNG_GameManager : Photon.MonoBehaviour
         Vector2 randpos = UnityEngine.Random.insideUnitCircle * 5f;
         playerChar = PhotonNetwork.Instantiate(this.playerprefabname_overlaw, new Vector3(randpos.x, 0f, randpos.y), Quaternion.identity, 0);
         PhotonNetwork.player.SetAttribute(PlayerAttributes.HASSPAWNED, true);
+        PhotonNetwork.player.SetAttribute(PlayerAttributes.TEAM, 0);
         PhotonNetwork.player.SetPlayerState(PlayerState.inGame);
 
         //SETUP CAMERA
