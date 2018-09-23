@@ -583,6 +583,7 @@
     <Compile Include="Assets\Add-ons\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\Add-ons\UnityPackages\JsonNetSample\JsonNetSample.cs" />
     <Compile Include="Assets\Add-ons\Universal Pixel Hero (Warrior)\Scripts\Controller.cs" />
+    <Compile Include="Assets\Contactor.cs" />
     <Compile Include="Assets\CTRL_WarriorAvatar.cs" />
     <Compile Include="Assets\OnAnimationEnd.cs" />
     <Compile Include="Assets\RotateFromMouseToCenter.cs" />

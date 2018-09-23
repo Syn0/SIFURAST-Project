@@ -22,7 +22,6 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
         PhotonNetwork.sendRate = 100;
         PhotonNetwork.autoJoinLobby = false;    // we join randomly. always. no need to join a lobby to get the list of rooms.
-        Debug.Log("2dlevel.Start()");
         if (PhotonNetwork.connected)
         {
             PhotonNetwork.isMessageQueueRunning = true;
@@ -40,8 +39,6 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
     {
         if (ConnectInUpdate && AutoConnect && !PhotonNetwork.connected)
         {
-            Debug.Log("Update() was called by Unity. Scene is loaded. Let's connect to the Photon Master Server. Calling: PhotonNetwork.ConnectUsingSettings();");
-
             ConnectInUpdate = false;
             PhotonNetwork.ConnectUsingSettings(Version + "." + SceneManagerHelper.ActiveSceneBuildIndex);
         }
@@ -54,19 +51,16 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public virtual void OnConnectedToMaster()
     {
-        Debug.Log("OnConnectedToMaster()");
         PhotonNetwork.JoinRandomRoom();
     }
     
     public virtual void OnJoinedLobby()
     {
-        Debug.Log("OnJoinedLobby()");
         PhotonNetwork.JoinRandomRoom();
     }
 
     public virtual void OnPhotonRandomJoinFailed()
     {
-        Debug.Log("OnPhotonRandomJoinFailed()");
         PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 10 }, null);
     }
 
@@ -79,6 +73,5 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public void OnJoinedRoom()
     {
-        Debug.Log("OnJoinedRoom()");
     }
 }
