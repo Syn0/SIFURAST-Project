@@ -1,8 +1,8 @@
 WindowsStandalone
 SceneListBegin?
-Assets/SCNS/1-2d_level.unity
 Assets/SCNS/3-ServerConnect.unity
-Assets/SCNS/2-City_Level.unity
+Assets/SCNS/2-3d_level.unity
+Assets/SCNS/1-2d_level.unity
 SceneListEnd?
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.PUN_AttributeSynchronizer
 82c8c8940439d24517b71a242f62fbc3 Assembly-CSharp.dll:.HighlightOwnedGameObj
@@ -114,6 +114,8 @@ f61c0793411f10cf5fbfa1473fef5ef2 UnityEngine.UI.dll:UnityEngine.UI.ToggleGroup
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.OnClickFlashRpc
 ebfdd2489194de73284a969277395ad0 Assembly-CSharp.dll:.DemoRPGMovement
 bbd163ee13b79cee63665508d119042a Assembly-CSharp.dll:.MB_SwapShirts
+6dd4b171fcb37229a7780ea8f47334c9 Assembly-CSharp.dll:.JsonNetSample
+f21760f8e8fd38039a8536db28fa815c Assembly-CSharp.dll:.CTRL_WarriorAvatar
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:ExitGames.Demos.ToDemoHubButton
 765037da3d8faeee91e39d672b924c61 Assembly-CSharp.dll:.EnvMapAnimator
 06a7c7079fa0a7ea37c75d6686628aec Assembly-CSharp.dll:.PhotonHandler
@@ -201,6 +203,7 @@ e626bae268f8b272b7a2d07760d262c6 Assembly-CSharp.dll:.PickupController
 1356b4a6096c35c829823b7e28399030 Assembly-CSharp.dll:.HubGui
 e341391a60b4ecbd3f7c8a5750457b27 Assembly-CSharp.dll:.MB3_BatchPrefabBaker
 76119242f799591c84bce8d3be04eee2 Assembly-CSharp.dll:.BakeTexturesAtRuntime
+dd5481137759597d614818793c90a7fe Assembly-CSharp.dll:.Controller
 5a78906060300940acb71bc3dfb6396d Assembly-CSharp.dll:.DragToMove
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.CubeLerp
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:cakeslice.Rotate
@@ -233,6 +236,7 @@ d803c6ce964101dbcdbd57e6cb517625 Assembly-CSharp.dll:.TriggerZone
 4b0d5fd231590425ab0129d43beb9755 Assembly-CSharp.dll:.SceneViewOutline
 293b3d08f8607df9b4483b0dc4d8d5d6 Assembly-CSharp.dll:.ColorPerPlayer
 dad1c1272dfe1898bb613dcb2631bcce Assembly-CSharp.dll:TMPro.Examples.Benchmark02
+0c51acb4b4c4e6136b28b668f88e37df Assembly-CSharp.dll:.OnAnimationEnd
 2165accb3ea2740b87b88a727c43d0b3 Assembly-CSharp.dll:.PickupDemoGui
 5f1ee95103896e75aa6e6b415add844b Assembly-CSharp.dll:.ChannelSelector
 090584907af2e462994cc893ced507b3 Assembly-CSharp.dll:.PhotonRigidbodyView
@@ -355,7 +359,7 @@ be525d60540508a547aac126024e430f Assembly-CSharp.dll:.MNG_CameraController
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.MB2_UpdateSkinnedMeshBoundsFromBones
 08712033bfb8d4fd2842041f9a20ded7 Assembly-CSharp.dll:.ManualPhotonViewAllocator
 6826e26f7cc718f870001971f13e79c7 Assembly-CSharp.dll:TMPro.TMP_TextEventHandler
-a2d612afa0d90f75edf1d10832a65609 Assembly-CSharp.dll:.JumpAndRunMovement
+2f3ebed3be06c3ba157272229dee19bf Assembly-CSharp.dll:.JumpAndRunMovement
 1356b4a6096c35c829823b7e28399030 Assembly-CSharp.dll:.DemoMecanimGUI
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:TMPro.Examples.VertexColorCycler
 d1755adc44fcb9e44c42a5889d35f7a0 Assembly-CSharp.dll:.MoveByKeys
@@ -383,4 +387,3 @@ ea406e396a4d8b77694e82808b8d34cc Assembly-CSharp.dll:.MB3_DisableHiddenAnimation
 54a26a95db9c623b6eb6fc01ae3ef891 Assembly-CSharp.dll:.CubeExtra
 34e025057ef78b1bf238460cdf6583a3 Assembly-CSharp.dll:TMPro.Examples.ObjectSpin
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:TMPro.Examples.SimpleScript
-6dd4b171fcb37229a7780ea8f47334c9 Assembly-CSharp.dll:.JsonNetSample

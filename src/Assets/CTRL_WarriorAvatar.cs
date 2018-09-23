@@ -8,7 +8,9 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 {
 
 
-    public float Speed;
+    public float RunSpeed = 5f;
+    public float RunAccel = 5f;
+    public float RunDecel = 0.1f;
     public float AnimSpeed = 1f;
     public float JumpForce;
 
@@ -22,6 +24,8 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
     Vector3 facingL;
     Vector3 facingR;
 
+    Camera cam;
+
     void Awake()
     {
         //Debug.Log(Environment.Version);
@@ -32,6 +36,10 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
         float s = transform.localScale.x;
         facingL = new Vector3(-s, s, 1);
         facingR = new Vector3(s, s, 1);
+
+
+        if (!m_PhotonView.isMine || m_PhotonView.isSceneView) return;
+        cam = Camera.main;
     }
 
     private void Start()
@@ -42,22 +50,45 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void Update()
     {
-        UpdateIsGrounded();
-        UpdateIsRunning();
-        UpdateFacingDirection();
+        if (!m_PhotonView.isMine || m_PhotonView.isSceneView) return;
 
-        if (Input.GetKeyDown(KeyCode.F)) m_Animator.SetInteger("stateVal", 4);
-        if (Input.GetKeyDown(KeyCode.G)) m_Animator.SetInteger("stateVal", 5);
-        if (Input.GetKeyDown(KeyCode.H)) m_Animator.SetInteger("stateVal", 6);
-        if (Input.GetKeyDown(KeyCode.C)) m_Animator.SetInteger("stateVal", 3);
+        Vector3 pos = transform.position;
+        pos.z = cam.transform.position.z;
+        pos.y += 2f;
+        cam.transform.position = Vector3.Lerp(cam.transform.position, pos, Time.deltaTime*2.5f);
+
+
+        if (Input.GetButtonDown("Btn0") && !isAnimating)
+        {
+            m_Animator.SetInteger("stateVal", 4);
+            StartCoroutine(resetIdleState());
+        }
+        if (Input.GetButtonDown("Btn1") && !isAnimating)
+        {
+            m_Animator.SetInteger("stateVal", 5);
+            StartCoroutine(resetIdleState());
+        }
+        if (Input.GetButtonDown("Btn2") && !isAnimating)
+        {
+            m_Animator.SetInteger("stateVal", 6);
+            StartCoroutine(resetIdleState());
+        }
+        if (Input.GetButtonDown("Btn4") && !isAnimating && Mathf.Abs(m_Body.velocity.x) > 0.1f)
+        {
+            m_Animator.SetInteger("stateVal", 3);
+            StartCoroutine(resetIdleState());
+        }
     }
 
     void FixedUpdate()
     {
-        if (m_PhotonView.isMine == false)
-        {
-            return;
-        }
+
+        UpdateIsGrounded();
+        UpdateIsRunning();
+        UpdateFacingDirection();
+
+        if (m_PhotonView.isSceneView) m_Body.velocity = new Vector2(m_Body.velocity.x * RunDecel, m_Body.velocity.y);
+        if (!m_PhotonView.isMine || m_PhotonView.isSceneView) return;
 
         UpdateMovement();
         UpdateJumping();
@@ -77,12 +108,21 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void UpdateJumping()
     {
-        if (Input.GetButton("Jump") && m_IsGrounded)
+        if (Input.GetButtonDown("Btn3") && m_IsGrounded)
         {
             m_Animator.SetInteger("stateVal", 2);
             m_Body.AddForce(Vector2.up * JumpForce);
             m_PhotonView.RPC("DoJump", PhotonTargets.Others);
         }
+    }
+
+    bool isAnimating = false;
+    IEnumerator resetIdleState()
+    {
+        isAnimating = true;
+        yield return new WaitForSeconds(0.28f);
+        m_Animator.SetInteger("stateVal", 0);
+        isAnimating = false;
     }
 
     [PunRPC]
@@ -93,19 +133,20 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void UpdateMovement()
     {
-        Vector2 movementVelocity = m_Body.velocity;
-        if (Input.GetAxisRaw("Horizontal") > 0.5f)
-            movementVelocity.x = Speed;
-        else if (Input.GetAxisRaw("Horizontal") < -0.5f)
-            movementVelocity.x = -Speed;
+
+        if (Input.GetAxisRaw("Horizontal") > 0.5f && m_Body.velocity.x < RunSpeed)
+            m_Body.AddForce(new Vector2(RunAccel, 0f), ForceMode2D.Impulse);
+        else if (Input.GetAxisRaw("Horizontal") < -0.5f && m_Body.velocity.x > -RunSpeed)
+            m_Body.AddForce(new Vector2(-RunAccel, 0f), ForceMode2D.Impulse);
         else
-            movementVelocity.x = 0;
-        m_Body.velocity = movementVelocity;
+            m_Body.velocity = new Vector2(m_Body.velocity.x * RunDecel, m_Body.velocity.y);
+
+
     }
 
     void UpdateIsRunning()
     {
-        if (m_Animator.GetInteger("stateVal") > 2) return;
+        if (!m_IsGrounded || m_Animator.GetInteger("stateVal") > 2) return;
         if (Mathf.Abs(m_Body.velocity.x) > 0.1f && m_Animator.GetInteger("stateVal") != 2)
         {
             m_Animator.SetInteger("stateVal", 1);
@@ -119,10 +160,10 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour
 
     void UpdateIsGrounded()
     {
-        Vector2 position = new Vector2(transform.position.x, transform.position.y - 0.1f);
+        Vector2 position = new Vector2(transform.position.x, transform.position.y - 0.05f);
 
         //RaycastHit2D hit = Physics2D.Raycast( position, -Vector2.up, 0.1f, 1 << LayerMask.NameToLayer( "Ground" ) );
-        RaycastHit2D hit = Physics2D.Raycast(position, -Vector2.up, 0.05f);
+        RaycastHit2D hit = Physics2D.Raycast(position, -Vector2.up, 0.1f);
 
         m_IsGrounded = hit.collider != null;
         if (m_IsGrounded && m_Animator.GetInteger("stateVal") == 2)
