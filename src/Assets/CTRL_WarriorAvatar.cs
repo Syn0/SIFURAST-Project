@@ -23,6 +23,7 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
 
     public bool m_IsGrounded;
 
+    float facing = 1;
     Vector3 facingL;
     Vector3 facingR;
 
@@ -35,7 +36,7 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
         m_Body = GetComponent<Rigidbody2D>();
         m_PhotonView = GetComponent<PhotonView>();
         m_txt_Username = GetComponentInChildren<Text>();
-        ContactsTriggered = new List<Collision2D>();
+        ContactsTriggered = new List<Collider2D>();
 
         float s = mainSprite.transform.localScale.x;
         facingL = new Vector3(-s, s, 1);
@@ -79,7 +80,7 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
             StartCoroutine(resetIdleState());
             StartCoroutine(attack(2));
         }
-        if (Input.GetButtonDown("Btn4") && !isAnimating && Mathf.Abs(m_Body.velocity.x) > 0.1f)
+        if (Input.GetButtonDown("Btn4") && !isAnimating && Mathf.Abs(m_Body.velocity.x) > 1f)
         {
             m_Animator.SetInteger("stateVal", 3);
             StartCoroutine(resetIdleState());
@@ -92,7 +93,6 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
 
         UpdateIsGrounded();
         UpdateIsRunning();
-        UpdateFacingDirection();
 
         if (m_PhotonView.isSceneView) m_Body.velocity = new Vector2(m_Body.velocity.x * RunDecel, m_Body.velocity.y);
         if (!m_PhotonView.isMine || m_PhotonView.isSceneView) return;
@@ -101,11 +101,6 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
         UpdateJumping();
     }
 
-    void UpdateFacingDirection()
-    {
-        if (m_Body.velocity.x > 0.2f) mainSprite.transform.localScale = facingR;
-        else if (m_Body.velocity.x < -0.2f) mainSprite.transform.localScale = facingL;
-    }
 
     void UpdateJumping()
     {
@@ -128,17 +123,26 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
 
     IEnumerator attack(int attackType)
     {
+        if(attackType == 3) m_Body.AddForce(new Vector2(15f * facing, 3f), ForceMode2D.Impulse);
         m_c2d_atckTrigger.gameObject.SetActive(true);
         yield return new WaitForSeconds(0.14f);
         m_c2d_atckTrigger.gameObject.SetActive(false);
 
-        foreach (Collision2D item in ContactsTriggered.Where(w=> w.gameObject!=null && w.gameObject.tag=="Player"))
+        foreach (Collider2D item in ContactsTriggered.Where(w=> w.gameObject!=null && w.gameObject.tag== "Collidable"))
         {
+            Rigidbody2D body = item.GetComponentInParent<Rigidbody2D>() ?? item.GetComponent<Rigidbody2D>();
+            if (body.tag == "Player") body.GetComponent<CTRL_WarriorAvatar>().callBloodInstance();
             switch (attackType)
             {
-                default: Debug.Log(item.gameObject.name); break;
+                case 0:
+                    body.AddForce(new Vector2(2f * facing, 5f), ForceMode2D.Impulse);
+                    break;
+                case 2:
+                    body.AddForce(new Vector2(15f* facing, 1f), ForceMode2D.Impulse);
+                    break;
+                default:
+                    break;
             }
-
         }
         ContactsTriggered.Clear();
 
@@ -149,20 +153,19 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
     {
         m_Animator.SetInteger("stateVal", 2);
     }
-
     void UpdateMovement()
     {
 
-        if (Input.GetAxisRaw("Horizontal") > 0.5f && m_Body.velocity.x < RunSpeed)
-            m_Body.AddForce(new Vector2(RunAccel, 0f), ForceMode2D.Impulse);
-        else if (Input.GetAxisRaw("Horizontal") < -0.5f && m_Body.velocity.x > -RunSpeed)
-            m_Body.AddForce(new Vector2(-RunAccel, 0f), ForceMode2D.Impulse);
+        if (Mathf.Abs(Input.GetAxisRaw("Horizontal")) > 0.1f)
+        {
+            if (Input.GetAxisRaw("Horizontal") < -0.1f) { mainSprite.transform.localScale = facingL; facing = -1; }
+            if (Input.GetAxisRaw("Horizontal") > 0.1f) {facing = 1; mainSprite.transform.localScale = facingR;}
+            if(Mathf.Abs(m_Body.velocity.x) < RunSpeed)
+                m_Body.AddForce(new Vector2(RunAccel * Input.GetAxisRaw("Horizontal") * Mathf.Abs(Input.GetAxisRaw("Horizontal")), .05f), ForceMode2D.Impulse);
+        }
         else
             m_Body.velocity = new Vector2(m_Body.velocity.x * RunDecel, m_Body.velocity.y);
-
-
     }
-
     void UpdateIsRunning()
     {
         if (!m_IsGrounded || m_Animator.GetInteger("stateVal") > 2) return;
@@ -175,7 +178,6 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
         if (Mathf.Abs(m_Body.velocity.x) <= 0.1f && m_Animator.GetInteger("stateVal") == 1)
             m_Animator.SetInteger("stateVal", 0);
     }
-
     void UpdateIsGrounded()
     {
         Vector2 position = new Vector2(transform.position.x, transform.position.y - 0.05f);
@@ -187,8 +189,16 @@ public class CTRL_WarriorAvatar : Photon.MonoBehaviour, I2DContactsCollector
         }
     }
 
-    List<Collision2D> ContactsTriggered;
-    public void AddCollision2D(Collision2D coll)
+
+    public GameObject gop_bloodparticles;
+    public void callBloodInstance() { m_PhotonView.RPC("SpawnBlood", PhotonTargets.All); }
+    [PunRPC]
+    void SpawnBlood()
+    {
+        GameObject.Instantiate(gop_bloodparticles, transform.position + new Vector3(0,1.35f,0), Quaternion.identity);
+    }
+    List<Collider2D> ContactsTriggered;
+    public void AddCollision2D(Collider2D coll)
     {
         ContactsTriggered.Add(coll);
     }
