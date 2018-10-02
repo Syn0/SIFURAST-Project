@@ -40,7 +40,8 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
         if (ConnectInUpdate && AutoConnect && !PhotonNetwork.connected)
         {
             ConnectInUpdate = false;
-            PhotonNetwork.ConnectUsingSettings(Version + "." + SceneManagerHelper.ActiveSceneBuildIndex);
+            //PhotonNetwork.ConnectUsingSettings(Version + "." + SceneManagerHelper.ActiveSceneBuildIndex);
+            StartCoroutine(MNG_Multiplayer.TryLogToRegionMaster());
         }
     }
 
@@ -51,17 +52,19 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public virtual void OnConnectedToMaster()
     {
+        Debug.Log("Connected to master");
         PhotonNetwork.JoinRandomRoom();
     }
     
     public virtual void OnJoinedLobby()
     {
+        Debug.Log("Connected to lobby");
         PhotonNetwork.JoinRandomRoom();
     }
 
     public virtual void OnPhotonRandomJoinFailed()
     {
-        PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 10 }, null);
+        PhotonNetwork.CreateRoom(null, new RoomOptions() { MaxPlayers = 10,IsOpen = true,IsVisible =true }, null);
     }
 
     // the following methods are implemented to give you some context. re-implement them as needed.
@@ -73,5 +76,10 @@ public class ConnectAndJoinRandom : Photon.MonoBehaviour
 
     public void OnJoinedRoom()
     {
+        Debug.Log("Connected to room");
     }
+
+
+
+
 }

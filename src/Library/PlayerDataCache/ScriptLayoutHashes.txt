@@ -1,8 +1,8 @@
 WindowsStandalone
 SceneListBegin?
+Assets/SCNS/1-2d_level.unity
 Assets/SCNS/3-ServerConnect.unity
 Assets/SCNS/2-3d_level.unity
-Assets/SCNS/1-2d_level.unity
 SceneListEnd?
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.PUN_AttributeSynchronizer
 82c8c8940439d24517b71a242f62fbc3 Assembly-CSharp.dll:.HighlightOwnedGameObj
@@ -115,7 +115,7 @@ f61c0793411f10cf5fbfa1473fef5ef2 UnityEngine.UI.dll:UnityEngine.UI.ToggleGroup
 ebfdd2489194de73284a969277395ad0 Assembly-CSharp.dll:.DemoRPGMovement
 bbd163ee13b79cee63665508d119042a Assembly-CSharp.dll:.MB_SwapShirts
 6dd4b171fcb37229a7780ea8f47334c9 Assembly-CSharp.dll:.JsonNetSample
-f21760f8e8fd38039a8536db28fa815c Assembly-CSharp.dll:.CTRL_WarriorAvatar
+36f4c370a6f671b1b085a266521f17a7 Assembly-CSharp.dll:.CTRL_WarriorAvatar
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:ExitGames.Demos.ToDemoHubButton
 765037da3d8faeee91e39d672b924c61 Assembly-CSharp.dll:.EnvMapAnimator
 06a7c7079fa0a7ea37c75d6686628aec Assembly-CSharp.dll:.PhotonHandler
@@ -294,6 +294,7 @@ e9bdabf9265d758d56f01bb188916fa8 UnityEngine.Networking.dll:UnityEngine.Networki
 73843688b51256aed059f049c540bca8 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformChild
 528ea1fd7c01796fc60c4e2f172ea229 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkTransformVisualizer
 e1025b836c346ec4d39479b488e7bb30 Assembly-CSharp.dll:MK.Glow.MKGlowFree
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.Contactor
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.OnAwakePhysicsSettings
 f09c70b354f2728874ce2e8717e12faf Assembly-CSharp.dll:AmplifyImpostors.AmplifyImpostor
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.PointedAtGameObjectInfo
@@ -387,3 +388,7 @@ ea406e396a4d8b77694e82808b8d34cc Assembly-CSharp.dll:.MB3_DisableHiddenAnimation
 54a26a95db9c623b6eb6fc01ae3ef891 Assembly-CSharp.dll:.CubeExtra
 34e025057ef78b1bf238460cdf6583a3 Assembly-CSharp.dll:TMPro.Examples.ObjectSpin
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:TMPro.Examples.SimpleScript
+98d4b44755c05b1a60d55f46c565e8e5 Assembly-CSharp.dll:.UI_Activator
+1aa45ba4efe973474bd37c6226123f94 Assembly-CSharp.dll:SpriterDotNetUnity.SpriterData
+08d09bdb1a0dceb22e7186850c546627 Assembly-CSharp.dll:SpriterDotNetUnity.SpriterDotNetBehaviour
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:SpriterDotNetUnity.SpriterDotNetBehaviourEditor

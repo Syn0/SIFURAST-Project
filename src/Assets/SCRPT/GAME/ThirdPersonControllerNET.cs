@@ -97,7 +97,7 @@ public class ThirdPersonControllerNET : Photon.MonoBehaviour
         {
 
 
-            if (Input.GetMouseButtonDown(0)
+            if (Input.GetButtonDown("Btn1")
                 && Time.timeSinceLevelLoad - timeCantPunch > durationCantPunch
                 && !_climbing) // you can only give a slap when you're a thief
             {
@@ -113,7 +113,7 @@ public class ThirdPersonControllerNET : Photon.MonoBehaviour
                 }
             }
 
-            if (Input.GetButtonDown("Jump") 
+            if (Input.GetButtonDown("Btn0") 
                 && (grounded || (_climbing)))
             // Handle jumping
             {
@@ -210,35 +210,8 @@ public class ThirdPersonControllerNET : Photon.MonoBehaviour
     }
 
 
-    /// <summary>
-    /// Appel réseau d'immobilisation
-    /// </summary>
-    [PunRPC]
-    public void rpc_immobilize()
-    {
-        if (PhotonNetwork.player.GetAttribute(PlayerAttributes.HASSPAWNED,false) && PhotonNetwork.player.GetPlayerState() == PlayerState.inGame) 
-        {
-            isCapturingThief = false;
-            PhotonNetwork.player.SetAttribute(PlayerAttributes.ISIMMOBILIZED, true);
-            timeCantMove = Time.timeSinceLevelLoad;
-            CTRL_Animation = GetComponent<AnimationController>();
-            CTRL_Animation.call_anim_trigger("Confuse");
-        }
-    }
 
 
-    /// <summary>
-    /// Appel réseau de capture
-    /// </summary>
-    [PunRPC]
-    public void rpc_capture()
-    {
-        if (PhotonNetwork.player.GetAttribute(PlayerAttributes.HASSPAWNED, false) && PhotonNetwork.player.GetPlayerState() == PlayerState.inGame) // can't be capture if you're a spectator
-        {
-            Vector2 randpos = UnityEngine.Random.insideUnitCircle * 6f;
-            transform.position =  new Vector3(randpos.x,0f, randpos.y);// ZONE PRISON A FAIRE
-        }
-    }
 
 
 }

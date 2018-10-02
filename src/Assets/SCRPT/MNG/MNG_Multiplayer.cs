@@ -87,7 +87,7 @@ public class MNG_Multiplayer : MonoBehaviour {
     /// </summary>
     public void startPUNConnect()
     {
-        StartCoroutine(TryLogToMaster());
+        StartCoroutine(TryLogToRegionMaster());
     }
     IEnumerator TryLogToMaster()
     {
@@ -109,6 +109,20 @@ public class MNG_Multiplayer : MonoBehaviour {
             yield return new WaitForSecondsRealtime(3f);
         }
         print("<color=green>Connected to master  : " + MS_adress + ":" + MS_port + " " + MS_ConnVersion + " " + MS_protocol.ToString() + " </color>");
+    }
+
+    public static IEnumerator TryLogToRegionMaster()
+    {
+        while (!PhotonNetwork.connected)
+        {
+                print("<color=green>Trying ConnectToRegion EU : " + "v1.0" + " </color>");
+                PhotonNetwork.ConnectToRegion(CloudRegionCode.eu, "v1.0");
+            yield return new WaitForSecondsRealtime(3f);
+        }
+        PlayerPrefs.SetString("playerName", "Guest" + Random.Range(1, 9999));
+        PhotonNetwork.playerName = PlayerPrefs.GetString("playerName");
+        print("<color=green>Connected to master region as "+ PhotonNetwork.playerName + ".</color>");
+
     }
 
     /// <summary>
