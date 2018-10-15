@@ -583,10 +583,8 @@
     <Compile Include="Assets\Add-ons\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\Add-ons\UnityPackages\JsonNetSample\JsonNetSample.cs" />
     <Compile Include="Assets\Add-ons\Universal Pixel Hero (Warrior)\Scripts\Controller.cs" />
-    <Compile Include="Assets\Contactor.cs" />
-    <Compile Include="Assets\CTRL_WarriorAvatar.cs" />
-    <Compile Include="Assets\OnAnimationEnd.cs" />
-    <Compile Include="Assets\RotateFromMouseToCenter.cs" />
+    <Compile Include="Assets\SCRPT\Contactor.cs" />
+    <Compile Include="Assets\SCRPT\CTRL_WarriorAvatar.cs" />
     <Compile Include="Assets\SCRPT\GAME\AnimationController.cs" />
     <Compile Include="Assets\SCRPT\GAME\CloseCameraFade.cs" />
     <Compile Include="Assets\SCRPT\GAME\PlayerGBInfo.cs" />
@@ -603,9 +601,13 @@
     <Compile Include="Assets\SCRPT\MNG\MNG_MainMenu.cs" />
     <Compile Include="Assets\SCRPT\MNG\MNG_Multiplayer.cs" />
     <Compile Include="Assets\SCRPT\MNG\Onstart_Activator.cs" />
+    <Compile Include="Assets\SCRPT\OnAnimationEnd.cs" />
     <Compile Include="Assets\SCRPT\PUN\ChatVik.cs" />
     <Compile Include="Assets\SCRPT\PUN\PUN_AttributeSynchronizer.cs" />
     <Compile Include="Assets\SCRPT\PUN\PUN_Synchroniser.cs" />
+    <Compile Include="Assets\SCRPT\RotateFromMouseToCenter.cs" />
+    <Compile Include="Assets\SCRPT\UI_Activator.cs" />
+    <Compile Include="Assets\SCRPT\WEB\wwwManager.cs" />
     <Compile Include="Assets\SpriterDotNet\DefaultContentLoader.cs" />
     <Compile Include="Assets\SpriterDotNet\IContentLoader.cs" />
     <Compile Include="Assets\SpriterDotNet\Lib\Animator.cs" />
@@ -634,8 +636,6 @@
     <Compile Include="Assets\SpriterDotNet\SpriterDotNetBehaviourEditor.cs" />
     <Compile Include="Assets\SpriterDotNet\SpriterImporter.cs" />
     <Compile Include="Assets\SpriterDotNet\UnityAnimator.cs" />
-    <Compile Include="Assets\UI_Activator.cs" />
-    <Compile Include="Assets\WEB\wwwManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Add-ons\AmplifyImpostors\ChangeLog.txt" />

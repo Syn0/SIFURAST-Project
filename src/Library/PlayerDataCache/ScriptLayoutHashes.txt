@@ -243,6 +243,7 @@ dad1c1272dfe1898bb613dcb2631bcce Assembly-CSharp.dll:TMPro.Examples.Benchmark02
 4ce2b1853c9a392b036a6a654be90ccb Assembly-CSharp.dll:.InstantiateCube
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.IgnoreUiRaycastWhenInactive
 79faa3d65f06fd0a6111fd24966956f5 Assembly-CSharp.dll:.ChatAppIdCheckerUI
+98d4b44755c05b1a60d55f46c565e8e5 Assembly-CSharp.dll:.UI_Activator
 05524b8f659e7bfe5756d1335fec24ba TextMeshPro-2017.3-Editor.dll:TMPro.EditorUtilities.DropdownEditor
 05524b8f659e7bfe5756d1335fec24ba TextMeshPro-2017.3-Editor.dll:TMPro.EditorUtilities.TMP_ColorGradientEditor
 05524b8f659e7bfe5756d1335fec24ba TextMeshPro-2017.3-Editor.dll:TMPro.EditorUtilities.TMP_ContextMenus
@@ -274,6 +275,7 @@ a9843e41911d7d4b9a599c0282c0b63c Assembly-CSharp.dll:.MB3_MeshBaker
 9289531c6670f72acc868d969a499281 Assembly-CSharp.dll:.ThirdPersonControllerNET
 30c6237931168f8b4c2f10a656a47aa8 Assembly-CSharp.dll:.PickupItem
 b9efe2a0d1c9ba7bc46e66a07a897115 Assembly-CSharp.dll:.ServerSettings
+05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:SpriterDotNetUnity.SpriterDotNetBehaviourEditor
 76015de5fcb247eeb8df66c001d5a22d Assembly-CSharp.dll:TMPro.Examples.TMP_FrameRateCounter
 fb2ac97018c2c9b8b721d1a47fc40206 Assembly-CSharp.dll:ExitGames.Demos.DemoAnimator.Launcher
 b8f04bdad423045528c67dfa4c3dca0d Assembly-CSharp.dll:TMPro.Examples.VertexShakeA
@@ -342,6 +344,7 @@ e29eedec83444c5ff91ad08de30f1219 Assembly-CSharp.dll:.GUICustomAuth
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:cakeslice.Toggle
 48a9dee325686d1924a2646b71c83f08 Assembly-CSharp.dll:TMPro.Examples.Benchmark01
 9de3a22eca9aefadba2d10d5987cefe3 UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
+1aa45ba4efe973474bd37c6226123f94 Assembly-CSharp.dll:SpriterDotNetUnity.SpriterData
 8e75c7ff572e377afe5aec0a3c77276b Assembly-CSharp.dll:.ThirdPersonCamera
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ThirdPersonNetwork
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:.ThiefZonePoint
@@ -384,11 +387,8 @@ af7666733efcc974926d7d470e1732a6 Assembly-CSharp.dll:TMPro.Examples.SkewTextExam
 8640e50cdc7cd7949553c7f8dfb0536e MeshBakerCore.dll:.MB3_AtlasPackerRenderTexture
 ea406e396a4d8b77694e82808b8d34cc Assembly-CSharp.dll:.MB3_DisableHiddenAnimations
 4a4a60112e86afdd30ae1480725c01cb Assembly-CSharp.dll:.HierarchyData
+08d09bdb1a0dceb22e7186850c546627 Assembly-CSharp.dll:SpriterDotNetUnity.SpriterDotNetBehaviour
 05937d322efaec84a601d27f7ecae7c8 Assembly-CSharp.dll:.MB3_MultiMeshBaker
 54a26a95db9c623b6eb6fc01ae3ef891 Assembly-CSharp.dll:.CubeExtra
 34e025057ef78b1bf238460cdf6583a3 Assembly-CSharp.dll:TMPro.Examples.ObjectSpin
 05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:TMPro.Examples.SimpleScript
-98d4b44755c05b1a60d55f46c565e8e5 Assembly-CSharp.dll:.UI_Activator
-1aa45ba4efe973474bd37c6226123f94 Assembly-CSharp.dll:SpriterDotNetUnity.SpriterData
-08d09bdb1a0dceb22e7186850c546627 Assembly-CSharp.dll:SpriterDotNetUnity.SpriterDotNetBehaviour
-05524b8f659e7bfe5756d1335fec24ba Assembly-CSharp.dll:SpriterDotNetUnity.SpriterDotNetBehaviourEditor
